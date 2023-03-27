@@ -19,9 +19,12 @@ def Get_MS():
 	S5 = np.array([1,0,0,0,162,-260 ]).T
 	S6 = np.array([0,1,0, -162, 0, 390]).T
 	S = [S1,S2,S3,S4,S5,S6]
-	M[0][3] = 150
-	M[1][3] = -150
-	M[2][3] = -10
+	# M[0][3] = 150
+	# M[1][3] = -150
+	# M[2][3] = -10
+	M[0][3] = 390
+	M[1][3] = 401
+	M[2][3] = 215.5
 
 
 
@@ -86,15 +89,17 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	temp_Z = zB + 59 + 83
 	theta2_p2 = np.arctan2([temp_Z - 152],[temp_X])
 	LL = ((temp_Z - 152)**2 + temp_X**2)**0.5
-	theta2_p1 = -np.arccos([(244**2 + LL**2 - 213**2)/2])
+	# print(LL)
+	temp = LL**2 + 244**2 - 213**2
+
+	while temp > 180: temp = temp - 360
+	print("Temp =", temp)
+	# theta2_p1 = -np.arccos([(244**2 + LL**2 - 213**2)/2])
+	theta2_p1 = -np.arccos([(temp*np.pi/180)])
 	theta2 = theta2_p1 + theta2_p2
-	theta3 = np.pi - np.arccos([(244**2 + 213**2 - LL**2)/2])
+	# theta3 = np.pi - np.arccos([(244**2 + 213**2 - LL**2)/2])
+	theta3 = np.pi - np.arccos([temp*np.pi/180])
 	theta4 = -theta2 - theta3
-
-
-
-
-
 
 	theta1 = 0.0
 	theta2 = 0.0
