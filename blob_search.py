@@ -2,6 +2,7 @@
 
 import cv2
 import numpy as np
+import math
 
 # ========================= Student's code starts here =========================
 
@@ -13,8 +14,10 @@ ty = 0.0
 
 # Function that converts image coord to world coord
 def IMG2W(col, row):
-    pass
-
+    # coordinates of image pixel 
+    xw = (row*np.cos(math.radians(theta)) - col*np.sin(math.radians(theta)))/beta + tx
+    xy = (row*np.sin(math.radians(theta)) + col*np.cos(math.radians(theta)))/beta + ty
+    return [xw, xy, 2.9/1000]
 # ========================= Student's code ends here ===========================
 
 def blob_search(image_raw, color):
@@ -25,13 +28,13 @@ def blob_search(image_raw, color):
     # ========================= Student's code starts here =========================
 
     # Filter by Color
-    params.filterByColor = False
+    params.filterByColor = True
 
     # Filter by Area.
-    params.filterByArea = False
+    params.filterByArea = True
 
     # Filter by Circularity
-    params.filterByCircularity = False
+    params.filterByCircularity = True
 
     # Filter by Inerita
     params.filterByInertia = False
@@ -48,12 +51,32 @@ def blob_search(image_raw, color):
     hsv_image = cv2.cvtColor(image_raw, cv2.COLOR_BGR2HSV)
 
     # ========================= Student's code starts here =========================
+    mask_image = None
+    if color == "blue":
+        lower = (110,50,50)     # blue lower
+        upper = (130,255,255)   # blue upper
 
-    lower = (110,50,50)     # blue lower
-    upper = (130,255,255)   # blue upper
+    elif color == 'green':
+        lower = (50, 50, 50)
+        upper = (70, 255, 255)
+
+    elif color == 'yellow':
+        lower = (20, 50, 50)
+        upper = (30, 255, 255)
+    
+    elif color == 'red':
+        lower_red = [0,50,50]
+        upper_red = [10,255,255]
+        lower_red2 = [160,50,50]
+        upper_red2 = [180,255,255]
+        mask1 = cv2.inRange(hsv, lower_red, upper_red)
+        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+        mask_image = cv2.bitwise_or(mask1, mask2)
+    if color != 'red':
+        mask_image = cv2.inRange(hsv_image, lower, upper)
 
     # Define a mask using the lower and upper bounds of the target color
-    mask_image = cv2.inRange(hsv_image, lower, upper)
+  
 
     # ========================= Student's code ends here ===========================
 
@@ -68,7 +91,7 @@ def blob_search(image_raw, color):
     # ========================= Student's code starts here =========================
 
     # Draw the keypoints on the detected block
-    # im_with_keypoints = cv2.drawKeypoints(image_raw, keypoints, ???)
+    im_with_keypoints = cv2.drawKeypoints(image_raw, keypoints, None, color=(0,0,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     # ========================= Student's code ends here ===========================
 
@@ -86,8 +109,8 @@ def blob_search(image_raw, color):
     cv2.imshow("Camera View", image_raw)
     cv2.namedWindow("Mask View")
     cv2.imshow("Mask View", mask_image)
-    # cv2.namedWindow("Keypoint View")
-    # cv2.imshow("Keypoint View", im_with_keypoints)
+    cv2.namedWindow("Keypoint View")
+    cv2.imshow("Keypoint View", im_with_keypoints)
 
     cv2.waitKey(2)
 

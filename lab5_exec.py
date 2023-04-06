@@ -22,6 +22,7 @@ xw_yw_Y = []
 
 # Any other global variable you want to define
 # Hints: where to put the blocks?
+dst = [0, -5, 5]
 
 
 # ========================= Student's code ends here ===========================
@@ -183,7 +184,7 @@ def move_arm(pub_cmd, loop_rate, dest, vel, accel):
 ################ Pre-defined parameters and functions no need to change above ################
 
 
-def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
+def move_block(pub_cmd, loop_rate, s, t, vel, accel):
 
     """
     start_xw_yw_zw: where to pick up a block in global coordinates
@@ -194,12 +195,17 @@ def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
 
     """
     # ========================= Student's code starts here =========================
-
-    # global variable1
-    # global variable2
-
-    error = 0
-
+    move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s[2], 0), vel, accel)
+    gripper(pub_cmd, loop_rate, suction_on)
+    time.sleep(0.5)
+    if(digital_in_0 == 0):
+        gripper(pub_cmd, loop_rate, suction_off)
+        error = 1
+    else:
+        move_arm(pub_cmd, loop_rate, lab_invk(t[0], t[1], t[2], 0), vel, accel)
+        gripper(pub_cmd, loop_rate, suction_off)
+        time.sleep(0.5)
+        error = 0
     # ========================= Student's code ends here ===========================
 
     return error
@@ -285,6 +291,9 @@ def main():
     time.sleep(5)
 
     # ========================= Student's code starts here =========================
+
+    move_arm(pub_command, loop_rate, xw_yw_Y, dst, vel, accel)
+    move_arm(pub_command, loop_rate, xw_yw_G, dst, vel, accel)
 
     """
     Hints: use the found xw_yw_G, xw_yw_Y to move the blocks correspondingly. You will
