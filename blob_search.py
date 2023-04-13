@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import cv2
 import numpy as np
@@ -7,17 +7,17 @@ import math
 # ========================= Student's code starts here =========================
 
 # Params for camera calibration
-theta = 0.0
-beta = 0.0
-tx = 0.0
-ty = 0.0
-
+theta = 0.0656
+beta = 770.584
+tx = (320 - 247)/beta
+ty = (240 - 54)/beta
 # Function that converts image coord to world coord
 def IMG2W(col, row):
-    # coordinates of image pixel 
-    xw = (row*np.cos(math.radians(theta)) - col*np.sin(math.radians(theta)))/beta + tx
-    xy = (row*np.sin(math.radians(theta)) + col*np.cos(math.radians(theta)))/beta + ty
-    return [xw, xy, 2.9/1000]
+    # coordinates of image pixel
+    # print("xw and xy" + str((col, row))) 
+    xw = (row*np.cos(-theta) - col*np.sin(-theta))/beta + tx
+    xy = (row*np.sin(-theta) + col*np.cos(-theta))/beta + ty
+    return [xw, xy, 2.9/100]
 # ========================= Student's code ends here ===========================
 
 def blob_search(image_raw, color):
@@ -31,7 +31,7 @@ def blob_search(image_raw, color):
     params.filterByColor = True
 
     # Filter by Area.
-    params.filterByArea = True
+    params.filterByArea = False
 
     # Filter by Circularity
     params.filterByCircularity = True
@@ -97,12 +97,15 @@ def blob_search(image_raw, color):
 
     xw_yw = []
 
-    if(num_blobs == 0):
-        print("No block found!")
-    else:
+    # if(num_blobs == 0):
+        #print("No block found!")
+        
+    #else:
+    if (num_blobs != 0):
         # Convert image coordinates to global world coordinate using IM2W() function
         for i in range(num_blobs):
             xw_yw.append(IMG2W(blob_image_center[i][0], blob_image_center[i][1]))
+            #print("append xw yw" + str(xw_yw))
 
 
     cv2.namedWindow("Camera View")

@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import copy
 import time
 import rospy
+import math
 
 import numpy as np
 from lab5_header import *
@@ -141,6 +142,7 @@ Move robot arm from one position to another
 """
 def move_arm(pub_cmd, loop_rate, dest, vel, accel):
 
+    print("dest is " + str(dest))
     global thetas
     global SPIN_RATE
 
@@ -195,6 +197,16 @@ def move_block(pub_cmd, loop_rate, s, t, vel, accel):
 
     """
     # ========================= Student's code starts here =========================
+    print("1")
+    print("s is " + str(s))
+    print("t is " + str(t))
+    if len(s) == 0 or len(t) == 0:
+        print("2")
+        return
+    if len(s) == 1:
+        print("3")
+        s = s[0]
+    print("4")
     move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s[2], 0), vel, accel)
     gripper(pub_cmd, loop_rate, suction_on)
     time.sleep(0.5)
@@ -272,7 +284,7 @@ def main():
     pub_command = rospy.Publisher('ur3/command', command, queue_size=10)
 
     # Initialize subscriber to ur3/position & ur3/gripper_input and callback fuction
-    # each time data is published
+    # each time data is publishedxw_yw_Y
     sub_position = rospy.Subscriber('ur3/position', position, position_callback)
     sub_input = rospy.Subscriber('ur3/gripper_input', gripper_input, input_callback)
 
@@ -291,9 +303,13 @@ def main():
     time.sleep(5)
 
     # ========================= Student's code starts here =========================
-
-    move_arm(pub_command, loop_rate, xw_yw_Y, dst, vel, accel)
-    move_arm(pub_command, loop_rate, xw_yw_G, dst, vel, accel)
+    while True:
+        if len(xw_yw_Y) != 0:
+            move_block(pub_command, loop_rate, xw_yw_Y, dst, vel, accel)
+            print(" we move the yellow block")
+        if len(xw_yw_G) != 0:
+            move_block(pub_command, loop_rate, xw_yw_G, dst, vel, accel)
+            print(" we move the green block")
 
     """
     Hints: use the found xw_yw_G, xw_yw_Y to move the blocks correspondingly. You will

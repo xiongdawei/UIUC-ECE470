@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import numpy as np
 from scipy.linalg import expm, logm
 from lab5_header import *
+import math
 
 """
 Use 'expm' for matrix exponential.
@@ -112,12 +113,12 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	LL = ((z_3end - L1)**2 + x_3end**2 + y_3end**2)**0.5
 
 	temp = LL**2 + (L3)**2 - (L5)**2
-
-	theta2_p1 = np.arccos([((temp/(2*LL*L3)))])
+	print("temp is " + str(temp/(2*LL*L3)))
+	theta2_p1 = np.arccos([(temp/(2*LL*L3))])
 	theta2 = theta2_p1 + theta2_p2
 	theta2 = -theta2
 	temp = L3**2 + L5**2 - LL**2
-
+	print("theta3 input" + str(temp/(2*L3*L5)))
 	theta3 = np.pi - np.arccos([temp/(2*L3*L5)])
 	theta4 = -theta2 - theta3
 	
