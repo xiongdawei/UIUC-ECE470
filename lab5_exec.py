@@ -203,20 +203,24 @@ def move_block(pub_cmd, loop_rate, s, t, vel, accel):
     if len(s) == 0 or len(t) == 0:
         print("2")
         return
-    if len(s) == 1:
-        print("3")
-        s = s[0]
+    s = s[0]
+    s_high = s[2] + 0.05
+    t_high = t[2] + 0.05
     print("4")
+    move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s_high, 0), vel, accel)
     move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s[2], 0), vel, accel)
     gripper(pub_cmd, loop_rate, suction_on)
     time.sleep(0.5)
+    move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s_high, 0), vel, accel)
     if(digital_in_0 == 0):
         gripper(pub_cmd, loop_rate, suction_off)
         error = 1
     else:
+        move_arm(pub_cmd, loop_rate, lab_invk(t[0], t[1], t_high, 0), vel, accel)
         move_arm(pub_cmd, loop_rate, lab_invk(t[0], t[1], t[2], 0), vel, accel)
         gripper(pub_cmd, loop_rate, suction_off)
         time.sleep(0.5)
+        move_arm(pub_cmd, loop_rate, lab_invk(t[0], t[1], t_high, 0), vel, accel)
         error = 0
     # ========================= Student's code ends here ===========================
 
@@ -303,13 +307,44 @@ def main():
     time.sleep(5)
 
     # ========================= Student's code starts here =========================
-    while True:
-        if len(xw_yw_Y) != 0:
-            move_block(pub_command, loop_rate, xw_yw_Y, dst, vel, accel)
-            print(" we move the yellow block")
-        if len(xw_yw_G) != 0:
-            move_block(pub_command, loop_rate, xw_yw_G, dst, vel, accel)
-            print(" we move the green block")
+    tar_y = [[0.19, -0.105, 0.035], [0.19, -0.155, 0.035]]
+    tar_g = [[0.25, -0.105, 0.035], [0.25, -0.155, 0.035]]
+    # while True:
+    #     if len(xw_yw_Y) != 0:
+    #             move_block(pub_command, loop_rate, xw_yw_Y, [0.19, -0.105, 0.035], vel, accel)
+    #             print(" we move the yellow block")
+    #             if len(xw_yw_Y) == 2:
+    #                 move_block(pub_command, loop_rate, xw_yw_Y, [0.19, -0.155, 0.035], vel, accel)
+    #                 print(" we move the yellow block")
+    for i in range(len(xw_yw_Y)):
+            print('\n', "XW_YW_Y =", xw_yw_Y, '\n')
+            move_block(pub_command, loop_rate, xw_yw_Y, tar_y[i], vel, accel)
+            print("we move the yellow block")
+            # i = 0
+            # while(i < 2):
+            #     if i == 0: 
+            #         move_block(pub_command, loop_rate, xw_yw_Y, [0.19, -0.105, 0.035], vel, accel)
+            #         print(" we move the yellow block")
+            #     if i == 1: 
+            #         move_block(pub_command, loop_rate, xw_yw_Y, [0.19, -0.155, 0.035], vel, accel)
+            #         print(" we move the yellow block")
+            #     i += 1
+    for i in range(len(xw_yw_G)):
+        move_block(pub_command, loop_rate, xw_yw_G, tar_g[i], vel, accel)
+        print("we move the green block")
+                # if len(xw_yw_Y) == 2:
+                #     move_block(pub_command, loop_rate, xw_yw_G, [0.25, -0.155, 0.035], vel, accel)
+                #     print(" we move the green block")
+                # return("Blocks moved successfully")
+            # i = 0
+            # while(i < 2):
+            #     if i == 0: 
+            #         move_block(pub_command, loop_rate, xw_yw_G, [0.25, -0.105, 0.035], vel, accel)
+            #         print("we move the green block")
+            #     if i == 1: 
+            #         move_block(pub_command, loop_rate, xw_yw_G, [0.25, -0.155, 0.035], vel, accel)
+            #         print(" we move the green block")
+            #     i += 1
 
     """
     Hints: use the found xw_yw_G, xw_yw_Y to move the blocks correspondingly. You will

@@ -9,15 +9,17 @@ import math
 # Params for camera calibration
 theta = 0.0656
 beta = 770.584
-tx = (320 - 247)/beta
-ty = (240 - 54)/beta
+ty = (320 - 267)/beta
+tx = (240 - 52)/beta
 # Function that converts image coord to world coord
 def IMG2W(col, row):
     # coordinates of image pixel
     # print("xw and xy" + str((col, row))) 
+    row -= 240
+    col -= 320
     xw = (row*np.cos(-theta) - col*np.sin(-theta))/beta + tx
     xy = (row*np.sin(-theta) + col*np.cos(-theta))/beta + ty
-    return [xw, xy, 2.9/100]
+    return [xw, xy, 3.4/100]
 # ========================= Student's code ends here ===========================
 
 def blob_search(image_raw, color):
@@ -28,13 +30,14 @@ def blob_search(image_raw, color):
     # ========================= Student's code starts here =========================
 
     # Filter by Color
-    params.filterByColor = True
+    params.filterByColor = False
 
     # Filter by Area.
-    params.filterByArea = False
-
+    params.filterByArea = True
+    params.minArea = 200
     # Filter by Circularity
     params.filterByCircularity = True
+    params.minCircularity = 0.4
 
     # Filter by Inerita
     params.filterByInertia = False

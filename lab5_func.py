@@ -62,6 +62,8 @@ def lab_fk(theta1, theta2, theta3, theta4, theta5, theta6):
 	return_value[4] = theta5
 	return_value[5] = theta6
 
+	print("Return Value = ", return_value)
+
 	return return_value
 	# ==============================================================#
 
