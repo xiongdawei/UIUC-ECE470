@@ -7,10 +7,10 @@ import math
 # ========================= Student's code starts here =========================
 
 # Params for camera calibration
-theta = 0.0656
-beta = 770.584
-ty = (320 - 267)/beta
-tx = (240 - 52)/beta
+theta = 0.0394
+beta = 750.01
+ty = (320 - 235)/beta
+tx = (240 - 55)/beta
 # Function that converts image coord to world coord
 def IMG2W(col, row):
     # coordinates of image pixel
@@ -34,16 +34,18 @@ def blob_search(image_raw, color):
 
     # Filter by Area.
     params.filterByArea = True
-    params.minArea = 200
+    params.minArea = 50
     # Filter by Circularity
-    params.filterByCircularity = True
-    params.minCircularity = 0.4
+    params.filterByCircularity = False
+    params.minCircularity = 0.5
+    params.maxCircularity = 0.6
 
     # Filter by Inerita
     params.filterByInertia = False
 
     # Filter by Convexity
-    params.filterByConvexity = False
+    params.filterByConvexity = True
+    params.minConvexity = 0.7
 
     # ========================= Student's code ends here ===========================
 
@@ -57,23 +59,19 @@ def blob_search(image_raw, color):
     mask_image = None
     if color == "blue":
         lower = (110,50,50)     # blue lower
-        upper = (130,255,255)   # blue upper
+        upper = (130,255,255)  
 
     elif color == 'green':
-        lower = (50, 50, 50)
-        upper = (70, 255, 255)
+        lower = (35, 60, 70)
+        upper = (95, 255, 200)
 
-    elif color == 'yellow':
-        lower = (20, 50, 50)
-        upper = (30, 255, 255)
-    
     elif color == 'red':
-        lower_red = [0,50,50]
-        upper_red = [10,255,255]
-        lower_red2 = [160,50,50]
-        upper_red2 = [180,255,255]
-        mask1 = cv2.inRange(hsv, lower_red, upper_red)
-        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+        lower_red = np.array([0,50,50])
+        upper_red = np.array([10,255,255])
+        lower_red2 = np.array([160,50,50])
+        upper_red2 = np.array([180,255,255])
+        mask1 = cv2.inRange(hsv_image, lower_red, upper_red)
+        mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
         mask_image = cv2.bitwise_or(mask1, mask2)
     if color != 'red':
         mask_image = cv2.inRange(hsv_image, lower, upper)
@@ -87,9 +85,11 @@ def blob_search(image_raw, color):
 
     # Find blob centers in the image coordinates
     blob_image_center = []
-    num_blobs = len(keypoints)
-    for i in range(num_blobs):
-        blob_image_center.append((keypoints[i].pt[0],keypoints[i].pt[1]))
+    num_blobs = 0
+    for i in range(len(keypoints)):
+        if (keypoints[i].pt[0] > 205 and keypoints[i].pt[0] < 456 and keypoints[i].pt[1] > 150 and keypoints[i].pt[1] < 330):
+            blob_image_center.append((keypoints[i].pt[0],keypoints[i].pt[1]))
+            num_blobs += 1
 
     # ========================= Student's code starts here =========================
 
@@ -101,7 +101,7 @@ def blob_search(image_raw, color):
     xw_yw = []
 
     # if(num_blobs == 0):
-        #print("No block found!")
+        # print("No block found!")
         
     #else:
     if (num_blobs != 0):

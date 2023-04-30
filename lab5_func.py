@@ -53,7 +53,7 @@ def lab_fk(theta1, theta2, theta3, theta4, theta5, theta6):
 	S6 = ScrewToBracket(S[5])
 	T = expm(S1*theta1)@expm(S2*theta2)@expm(S3*theta3)@expm(S4*theta4)@expm(S5*theta5)@expm(S6*theta6)@M
 
-	print(str(T) + "\n")
+	#print(str(T) + "\n")
 
 	return_value[0] = theta1 + PI
 	return_value[1] = theta2
@@ -61,8 +61,6 @@ def lab_fk(theta1, theta2, theta3, theta4, theta5, theta6):
 	return_value[3] = theta4 - (0.5*PI)
 	return_value[4] = theta5
 	return_value[5] = theta6
-
-	print("Return Value = ", return_value)
 
 	return return_value
 	# ==============================================================#
@@ -115,14 +113,20 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	LL = ((z_3end - L1)**2 + x_3end**2 + y_3end**2)**0.5
 
 	temp = LL**2 + (L3)**2 - (L5)**2
-	print("temp is " + str(temp/(2*LL*L3)))
+	#print("temp is " + str(temp/(2*LL*L3)))
 	theta2_p1 = np.arccos([(temp/(2*LL*L3))])
 	theta2 = theta2_p1 + theta2_p2
 	theta2 = -theta2
 	temp = L3**2 + L5**2 - LL**2
-	print("theta3 input" + str(temp/(2*L3*L5)))
+	#print("theta3 input" + str(temp/(2*L3*L5)))
 	theta3 = np.pi - np.arccos([temp/(2*L3*L5)])
 	theta4 = -theta2 - theta3
+
+	theta1 = theta1[0]
+	theta6 = theta6[0]
+	theta2 = theta2[0][0]
+	theta3 = theta3[0][0]
+	theta4 = theta4[0][0]
 	
 
 	theta1 = theta1 * 180/np.pi
@@ -132,12 +136,12 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	theta5 = theta5 * 180/np.pi
 	theta6 = theta6 * 180/np.pi
 
-	print("Theta1:", theta1)
-	print("Theta6:", theta6)
-	print("Theta5:", theta5)
-	print("Theta2:", theta2)
-	print("Theta3:", theta3)
-	print("Theta4:", theta4)
+	# print("Theta1:", theta1)
+	# print("Theta6:", theta6)
+	# print("Theta5:", theta5)
+	# print("Theta2:", theta2)
+	# print("Theta3:", theta3)
+	# print("Theta4:", theta4)
 
 	theta1 = theta1 * np.pi/180
 	theta2 = theta2 * np.pi/180
@@ -161,7 +165,7 @@ def ScrewToBracket(S):
 	r = S[:3]
 	v = S[3:]
 	r_skew = np.array([[0, -r[2], r[1], v[0]],[r[2], 0, -r[0], v[1]], [-r[1],r[0],0, v[2]]])
-	print(r_skew)
+	#print(r_skew)
 	res = np.concatenate((r_skew,np.array([[0,0,0,0]])), axis = 0)
 	return res
 	# ==============================================================#
