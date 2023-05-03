@@ -9,8 +9,8 @@ import math
 # Params for camera calibration
 theta = 0.0394
 beta = 750.01
-ty = (320 - 255)/beta
-tx = (240 - 55)/beta
+ty = (320 - 259)/beta
+tx = (240 - 53)/beta
 # Function that converts image coord to world coord
 def IMG2W(col, row):
     # coordinates of image pixel
@@ -19,7 +19,7 @@ def IMG2W(col, row):
     col -= 320
     xw = (row*np.cos(-theta) - col*np.sin(-theta))/beta + tx
     xy = (row*np.sin(-theta) + col*np.cos(-theta))/beta + ty
-    return [xw, xy, 3.4/100]
+    return [xw, xy, 3.2/100]
 # ========================= Student's code ends here ===========================
 
 def blob_search(image_raw, color):
@@ -54,6 +54,8 @@ def blob_search(image_raw, color):
 
     # Convert the image into the HSV color space
     hsv_image = cv2.cvtColor(image_raw, cv2.COLOR_BGR2HSV)
+    hsv_image[:150, :640] = np.zeros([150, 640, 3])
+
 
     # ========================= Student's code starts here =========================
     mask_image = None
@@ -80,14 +82,15 @@ def blob_search(image_raw, color):
   
 
     # ========================= Student's code ends here ===========================
-
+    mask_image[:150, :640] = np.zeros([150, 640])
+    # mask_image[300:, :640] = np.zeros([120, 640])
     keypoints = detector.detect(mask_image)
 
     # Find blob centers in the image coordinates
     blob_image_center = []
     num_blobs = 0
     for i in range(len(keypoints)):
-        if (keypoints[i].pt[0] > 205 and keypoints[i].pt[0] < 456 and keypoints[i].pt[1] > 150 and keypoints[i].pt[1] < 330):
+        if (keypoints[i].pt[0] > 200 and keypoints[i].pt[0] < 456 and keypoints[i].pt[1] > 150 and keypoints[i].pt[1] < 370):
             blob_image_center.append((keypoints[i].pt[0],keypoints[i].pt[1]))
             num_blobs += 1
 
@@ -95,7 +98,8 @@ def blob_search(image_raw, color):
 
     # Draw the keypoints on the detected block
     im_with_keypoints = cv2.drawKeypoints(image_raw, keypoints, None, color=(0,0,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
+    im_with_keypoints[:150, :640] = np.zeros([150,640, 3])
+    # im_with_keypoints[300:, :640] = np.zeros([120,640, 3])
     # ========================= Student's code ends here ===========================
 
     xw_yw = []

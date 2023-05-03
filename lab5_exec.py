@@ -186,8 +186,8 @@ def move_arm(pub_cmd, loop_rate, dest, vel, accel):
 ################ Pre-defined parameters and functions no need to change above ################
 
 def locate_one(r,g,b,l=0.025):
-    col_l = l* 0.93
-    col_u = l* 1.07
+    col_l = l* 0.90
+    col_u = l* 1.1
     if len(r) == 0 or len(g) == 0 or len(b) == 0:
         return None
     if len(r) == 1 and len(g) == 1 and len(b) == 1:
@@ -203,32 +203,79 @@ def locate_one(r,g,b,l=0.025):
         print("angle is: " + str(angle))
         return np.array([r[0], g[0], b[0]]), angle
     for i in range(len(r)):
+        # if check_range(r[i][0], r[i][1]) is False:
+        #     continue
         for j in range(len(g)):
+            # if check_range(g[j][0], g[j][1]) is False:
+            #     continue
             for k in range(len(b)):
+                # if check_range(b[k][0], b[k][1]) is False:
+                #     continue
                 dis_ij = np.linalg.norm(r[i]-g[j]) # Red Green
                 dis_jk = np.linalg.norm(g[j]-b[k]) # Green Blue
                 dis_ik = np.linalg.norm(r[i]-b[k]) # Red Blue
-                # print("----------------------------------")
-                # print(i,j,k)
-                # print("Distane IJ" + str(dis_ij))
-                # print("Distane JK" + str(dis_jk))
-                # print("Distane IK" + str(dis_ik))
-                #print("Coord" + str(np.array([r[0], g[0], b[0]])))
+                print("----------------------------------")
+                print(i,j,k)
+                print("Distane IJ" + str(dis_ij))
+                print("Distane JK" + str(dis_jk))
+                print("Distane IK" + str(dis_ik))
+                print("Coord" + str(np.array([r[0], g[0], b[0]])))
                 if dis_ij > col_l and dis_ij < col_u and dis_ik > col_l and dis_ik < col_u and dis_jk > 2*col_l and dis_jk < 2*col_u:
                     angle = cal_angle(r[i][0], r[i][1], b[k][0], b[k][1])
                     print("angle is: " + str(angle))
                     return np.array([r[i], g[j], b[k]]), angle
 
 
-def cal_angle(rx, ry, bx, by):
-    angle = np.arctan2(np.abs(rx - bx), np.abs(ry - by))*180/np.pi
-    if (rx < bx and ry < by) or (bx < rx and by < ry):
+def cal_angle(bx, by, gx, gy):  # blue first then green
+    angle = np.arctan2(np.abs(gx - bx), np.abs(gy - by))*180/np.pi
+    if (bx < gx and by < gy):
+        print("here --- 1")
+        print(-angle)
         return -angle
-    else:
-        return angle
 
+    elif (bx > gx and by < gy):
+        print("here --- 2")
+        print(angle)
+        return angle
+    elif (bx > gx and by > gy):
+        print("here --- 3")
+        print(-angle)
+        return angle + 90
+    else:
+        print("here --- 4")
+        print(angle + 90)
+        return (-angle - 90)
+        
+# def scan(all_blocks, r, g, b, num):
+#     block_, angle_ = locate_one(r, g, b)
+#     for block in all_blocks:
+#         if block[0][0] > block_[0][0] * 1.05 or block[0][0] < block_[0][0] *0.95  or block[0][1] < block_[0][1] *0.95 or block[0][1] > block_[0][1] *1.05:
+            
+        
+        
+#     if num == len(all_blocks):
+#         return True
+#     else:
+#         return False
 
 def move_block(pub_cmd, loop_rate, s, t, vel, accel, rot_agl = 0.0):
+    if np.abs(rot_agl) <= 90:
+        err = move_block_helper(pub_cmd, loop_rate, s, t, vel, accel, rot_agl)
+        if err == 1:
+            return False
+        return True
+    else:
+        if rot_agl > 90:
+            move_block_helper(pub_cmd, loop_rate, s, s, vel, accel, 90)
+            rot_agl -= 90
+            return False
+        else: 
+            move_block_helper(pub_cmd, loop_rate, s, s, vel, accel, -90)
+            rot_agl += 90
+            return False
+
+
+def move_block_helper(pub_cmd, loop_rate, s, t, vel, accel, rot_agl = 0.0):
     print("s is " + str(s))
     print("t is " + str(t))
 
@@ -243,6 +290,7 @@ def move_block(pub_cmd, loop_rate, s, t, vel, accel, rot_agl = 0.0):
     # ========================= Student's code starts here =========================
     s_high = s[2] + 0.05
     t_high = t[2] + 0.05
+
     move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s_high, rot_agl), vel, accel)
     move_arm(pub_cmd, loop_rate, lab_invk(s[0], s[1], s[2]-0.005, rot_agl), vel, accel)
     gripper(pub_cmd, loop_rate, suction_on)
@@ -251,6 +299,8 @@ def move_block(pub_cmd, loop_rate, s, t, vel, accel, rot_agl = 0.0):
     if(digital_in_0 == 0):
         gripper(pub_cmd, loop_rate, suction_off)
         error = 1
+        move_arm(pub_cmd, loop_rate, go_away, vel, accel)
+        return error
     else:
         move_arm(pub_cmd, loop_rate, lab_invk(t[0], t[1], t_high, 0), vel, accel)
         move_arm(pub_cmd, loop_rate, lab_invk(t[0], t[1], t[2], 0), vel, accel)
@@ -345,7 +395,7 @@ def main():
     time.sleep(5)
 
     # ========================= Student's code starts here =========================
-    tar_y = [[0.10, -0.2, 0.026], [0.10, -0.05, 0.026], [0.10, -0.125, 0.026*5]]
+    tar_y = [[0.10, -0.2, 0.026], [0.10, -0.02, 0.026], [0.10, -0.11, 0.026*7]]
     tar_g = [[0.25, -0.105, 0.035], [0.25, -0.155, 0.035]]
     count = 0
     while(len(xw_yw_R) != 0 or len(xw_yw_B) != 0 or len(xw_yw_G) != 0):
@@ -362,16 +412,25 @@ def main():
                 print("========")
                 print(res, angle)
         # #tar_left = [0.41, 0.018*(i-1), 0.02*i+0.01] #0.41 is x offset, 0.018 is 1/4 of the block length, 0.02 is the height of the block z + 0.01 is to make sure the block is above block below
-                if count < 4:
-                    move_block(pub_command, loop_rate, des[0], tar_y[0], vel, accel, angle)
+                if count < 6:
+                    res = move_block(pub_command, loop_rate, des[0], tar_y[0], vel, accel, angle)
+                    if res is False:
+                        move_arm(pub_command, loop_rate, go_away, vel, accel)
+                        continue
                     tar_y[0][2] += 0.026
                     tar_y[0][1] += 0.01
-                elif count < 8: 
-                    move_block(pub_command, loop_rate, des[0], tar_y[1], vel, accel, angle)
+                elif count < 12: 
+                    res = move_block(pub_command, loop_rate, des[0], tar_y[1], vel, accel, angle)
+                    if res is False:
+                        move_arm(pub_command, loop_rate, go_away, vel, accel)
+                        continue
                     tar_y[1][2] += 0.026
                     tar_y[1][1] -= 0.01
                 else:
-                    move_block(pub_command, loop_rate, des[0], tar_y[2], vel, accel, angle)
+                    res = move_block(pub_command, loop_rate, des[0], tar_y[2], vel, accel, angle)
+                    if res is False:
+                        move_arm(pub_command, loop_rate, go_away, vel, accel)
+                        continue
                 count += 1
 
         #     print("we move the left block")
