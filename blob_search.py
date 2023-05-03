@@ -9,7 +9,7 @@ import math
 # Params for camera calibration
 theta = 0.0394
 beta = 750.01
-ty = (320 - 235)/beta
+ty = (320 - 255)/beta
 tx = (240 - 55)/beta
 # Function that converts image coord to world coord
 def IMG2W(col, row):
